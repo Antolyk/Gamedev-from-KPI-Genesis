@@ -18,7 +18,7 @@ public class InputReader : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _playerEntity.MoveHorizontally(_direction);
+        _playerEntity.Move(_direction);
     }
 }
 

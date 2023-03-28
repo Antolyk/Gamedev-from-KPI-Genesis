@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class PlayerEntity : MonoBehaviour
 {
     [Header("Movement")]
@@ -16,27 +17,30 @@ public class PlayerEntity : MonoBehaviour
     [Header("Collision info")]
     [SerializeField] private LayerMask _whatIsGround;
     [SerializeField] private float _groundCheckDistance;
-
     private bool isGrounded;
+
     private Rigidbody2D _rigidbody;
+    private Animator _animator;
 
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
         _defJumpForce = _jumpForce;
     }
 
     private void Update()
     {
         CollisionChecks();
+        AnimationControllers();
 
         if (isGrounded)
         {
-            canDoubleJump = true;          
+            canDoubleJump = true;
         }
     }
 
-    public void MoveHorizontally(float direction)
+    public void Move(float direction)
     {
         SetDirection(direction);
         _rigidbody.velocity = new Vector2(_moveSpeed * direction, _rigidbody.velocity.y);
@@ -77,6 +81,14 @@ public class PlayerEntity : MonoBehaviour
         _faceRight = !_faceRight;
     }
 
+    private void AnimationControllers()
+    {
+        bool isMoving = _rigidbody.velocity.x != 0;
+        _animator.SetBool("isMoving", isMoving);
+        _animator.SetBool("isGrounded", isGrounded);
+        _animator.SetFloat("yVelocity", _rigidbody.velocity.y);
+    }
+
     private void CollisionChecks()
     {
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, _groundCheckDistance, _whatIsGround);
@@ -84,7 +96,6 @@ public class PlayerEntity : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - _groundCheckDistance));
+        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - _groundCheckDistance)); //відмальовка isGrounded
     }
 }
-
